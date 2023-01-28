@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "721500559508",
+    "project_id": "geotemp-a2491",
+    "storage_bucket": "geotemp-a2491.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:721500559508:android:856a51240f78f4cecabc81",
+        "android_client_info": {
+          "package_name": "com.geotemp.geotemp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "721500559508-n3irejm8ho6ic9ehauhq0huhkmdormc1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCABl_G-BeGCihrrzDhsg5Wy16ixfUnHfU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "721500559508-n3irejm8ho6ic9ehauhq0huhkmdormc1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
