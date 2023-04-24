@@ -1,6 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:tools="http://schemas.android.com/tools"
-    package="com.geotemp.geotemp">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.geotemp.geotemp"
+    tools:ignore="MissingVersion">
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
@@ -11,7 +16,11 @@
        android:requestLegacyExternalStorage="true"
         android:label="GeoTemp"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+       tools:targetApi="m">
+       <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyBBHOPDNEvYQe9-l9Klxt-Ny6JlIiXJ_AU"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

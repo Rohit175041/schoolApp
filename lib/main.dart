@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geotemp/HomeUI/HomeScreen.dart';
 import 'package:geotemp/phoneauth/login.dart';
-import 'package:geotemp/youtube/mainDownload.dart';
+
 // import 'src/my_app.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
                 future: checkLoginStatus(),
                 builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                   if (snapshot.data == false) {
-                    return const loginPhone();
+                    return const LoginPhone();
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
                         child:
                             const Center(child: CircularProgressIndicator()));
                   }
-                  return HomeScreen();
+                  return const HomeScreen();
                 }),
           );
         });

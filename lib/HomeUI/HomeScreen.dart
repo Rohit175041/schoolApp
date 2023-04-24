@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:geotemp/HomeUI/SchoolDetails.dart';
-import 'package:geotemp/HomeUI/SearchBar.dart';
 import 'package:geotemp/HomeUI/drawer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geotemp/HomeUI/searchdata.dart';
 import 'package:lottie/lottie.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  late DocumentSnapshot? _lastDocument=null;
+  late DocumentSnapshot? _lastDocument = null;
   List<Map<String, dynamic>> list = [];
   bool _isLoadingData = false;
   bool _isMoreData = true;
@@ -37,29 +34,18 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFF1744),
+        flexibleSpace: Container(
+            decoration: const BoxDecoration(
+                // borderRadius: BorderRadius.only(bottomRight:Radius.circular(250)),
+                gradient: LinearGradient(
+                    colors: <Color>[Colors.black26, Colors.lightBlueAccent],
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft))),
+        // backgroundColor: const Color(0xFFFF1744),
         title: const Center(child: Text("HomePage")),
         centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {
-                showSearch(context: context, delegate: Search()
-                );
-              },
-              icon: const Icon(Icons.search)),
-          IconButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Searchdata(),
-                    ),
-                        (route) => false);
-              },
-              icon: const Icon(Icons.add))
-        ],
       ),
-      drawer:  Mydrawer(),
+      drawer: Mydrawer(),
       body: list.isEmpty
           ? Center(
               child: SizedBox(
@@ -74,9 +60,7 @@ class HomeScreenState extends State<HomeScreen> {
                     controller: _scrollController,
                     itemCount: list.length,
                     itemBuilder: (context, index) {
-                      // print(list[index]['uid']);
                       return screen1(list[index], index + 1);
-                      // return Center(child: Text("${list[index]['uid']} ${index+1}"),);
                     }),
               ),
               _isLoadingData
@@ -119,11 +103,13 @@ class HomeScreenState extends State<HomeScreen> {
                     width: double.infinity,
                     height: 180,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Colors.black38,
-                        image: DecorationImage(
-                            image: NetworkImage(data['image'][0],),
-                            fit: BoxFit.cover),
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.black38,
+                      image: DecorationImage(
+                          image: NetworkImage(
+                            data['image'][0],
+                          ),
+                          fit: BoxFit.cover),
                     ),
                   ),
                   Row(
@@ -153,10 +139,10 @@ class HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 5),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "$n",
+                      "${data['name']}",
                       style: const TextStyle(
                           color: Colors.black87,
                           fontSize: 16.0,
@@ -223,7 +209,7 @@ class HomeScreenState extends State<HomeScreen> {
     } else {
       setState(() {
         _isLoadingData = false;
-    });
+      });
       // print("No More Data");
     }
   }

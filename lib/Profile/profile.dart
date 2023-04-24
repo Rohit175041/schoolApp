@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lottie/lottie.dart';
 import '../HomeUI/SchoolDetails.dart';
 
-
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 
@@ -16,10 +15,10 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   late DocumentSnapshot? _lastDocument = null;
   User? user = FirebaseAuth.instance.currentUser;
-  List<Map<String, dynamic>> _list = [];
+  final List<Map<String, dynamic>> _list = [];
   bool _isLoadingData = false;
   bool _isMoreData = true;
-  int _pagelimit = 10;
+  final int _pagelimit = 10;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -38,11 +37,11 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // toolbarHeight: 0,
         centerTitle: true,
         backgroundColor: Colors.red.shade600,
-        title: Text(user!.uid,
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+        // title: Text(user!.uid,
+        title: const Text("Profile data",
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
       ),
       body: _list.isEmpty
           ? Center(
@@ -59,8 +58,7 @@ class _ProfileState extends State<Profile> {
                     itemCount: _list.length,
                     itemBuilder: (Context, index) {
                       print(_list[index]['uid']);
-                      return Screen1(_list[index], index + 1);
-                      // return Center(child: Text("${_list[index]['uid']} ${index+1}"),);
+                      return screen(_list[index], index + 1);
                     }),
               ),
               _isLoadingData
@@ -70,28 +68,25 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Widget Screen1(dynamic data, int n) {
+  Widget screen(dynamic data, int n) {
     return SafeArea(
       child: Container(
         width: 300,
         margin: const EdgeInsets.only(right: 5, left: 5, top: 5),
         decoration: BoxDecoration(
-            // color: const Color(0xfcf9f8),
             color: Colors.white54,
             borderRadius: BorderRadius.circular(8.0),
             border: Border.all(color: Colors.black12)),
         child: InkWell(
           onTap: () async {
             Navigator.pushAndRemoveUntil(
-                context as BuildContext,
+                context,
                 MaterialPageRoute(
                   builder: (context) => SchoolDetails(
                     postID: data['postID'],
                   ),
                 ),
                 (route) => true);
-            // showSnackBar(Colors.green, "deleted");
-            // deleteData(data['postID'], data['image'][0].toString());
           },
           // SchoolDetails
           child: Padding(
@@ -111,37 +106,23 @@ class _ProfileState extends State<Profile> {
                             image: NetworkImage(data['image'][0]),
                             fit: BoxFit.cover)),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 8.0, right: 14, left: 10),
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: 30,
-                          width: 30,
-                          // color: Colors.black38,
-                          decoration: BoxDecoration(
-                              color: Colors.black45,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: const Icon(
-                            Icons.star_border,
-                            color: Colors.yellow,
-                          ),
-                        ),
-                      ),
-                    ],
+                  IconButton(
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ),
+                    onPressed: () async {
+                      alert(data['postID'], data['image'][0]);
+                    },
                   ),
                 ]),
                 const SizedBox(height: 5),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${data['postID']}",
+                      "${data['name']}",
                       style: const TextStyle(
                           color: Colors.black87,
                           fontSize: 16.0,
@@ -162,7 +143,6 @@ class _ProfileState extends State<Profile> {
                                 "${data['state']}, ${data['city']}",
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              // Text(data1.n)
                             ],
                           ),
                         ]),
@@ -178,7 +158,7 @@ class _ProfileState extends State<Profile> {
 
   //deleting post
   deleteData(id, url) async {
-    final storageReference = await FirebaseStorage.instance.refFromURL(url);
+    final storageReference = FirebaseStorage.instance.refFromURL(url);
     print(storageReference);
     await FirebaseFirestore.instance
         .collection("State")
@@ -244,5 +224,38 @@ class _ProfileState extends State<Profile> {
         duration: const Duration(seconds: 1),
         content: Text(text));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void alert(dynamic postid, dynamic imgurl) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Delete"),
+        content: const Text("Want to delete?"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(14),
+              child: const Text("No"),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              deleteData(postid, imgurl);
+              Navigator.of(ctx).pop();
+            },
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(14),
+              child: const Text("Yes"),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

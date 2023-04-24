@@ -11,103 +11,121 @@ import 'package:percent_indicator/percent_indicator.dart';
 
 class AddImage extends StatefulWidget {
   dynamic name;
+  dynamic std;
+  dynamic board;
   dynamic phonenumber;
   dynamic state;
   dynamic city;
+  dynamic pincode;
   dynamic address;
-  dynamic about;
+  dynamic schoolwebsite;
+  dynamic lat;
+  dynamic lon;
   dynamic postID;
 
   AddImage(
-      {this.name,
+      {super.key,
+      this.name,
       this.phonenumber,
+      this.std,
+      this.board,
       this.state,
       this.city,
       this.address,
-      this.about,
-      this.postID});
+      this.schoolwebsite,
+      this.postID,
+      this.lon,
+      this.lat,
+      this.pincode});
   @override
   _AddImageState createState() => _AddImageState();
 }
 
 class _AddImageState extends State<AddImage> {
   User? user = FirebaseAuth.instance.currentUser;
-  bool Uploading = false;
+  bool uploading = false;
   late CollectionReference imgRef;
   late firebase_storage.Reference ref;
   double progress = 0;
-  List<File> _BeCompImag = [];
-  List<String> _downloadurls = [];
-  List<File?> _aftCompImg = [];
+  final List<File> _beCompImag = [];
+  final List<String> _downloadurls = [];
+  final List<File?> _aftCompImg = [];
   final picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.red.shade600,
-          centerTitle: true,
-          title: const Text('Upload Image'),
-          actions: [
-            IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  chooseImage();
-                }),
-          ],
-        ),
-        body: Stack(
-          children: [
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(32),
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('img/bacgFormImg.jpeg'),
-                      fit: BoxFit.cover)),
-            ),
-            Uploading == false
-                ? Container(
-                    padding: const EdgeInsets.all(4),
-                    child: GridView.builder(
-                        itemCount: _aftCompImg.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2),
-                        itemBuilder: (context, index) {
-                          return Card(
-                            child: Image.file(
-                              File(_aftCompImg[index]!.path),
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        }),
-                  )
-                : Stack(children: [
-                    Center(
-                        child: CircularPercentIndicator(
-                      radius: 100.0,
-                      lineWidth: 15.0,
-                      percent: progress,
-                      animation: true,
-                      animationDuration: 2000,
-                      center: Text(
-                        "${progress * 100}%",
-                        style: const TextStyle(
-                            fontSize: 20, color: Colors.redAccent),
-                      ),
-                      footer: const Text(
-                        "Uploading...",
-                        style: TextStyle(fontSize: 20, color: Colors.redAccent),
-                      ),
-                    )),
-                  ])
-          ],
-        ),
+      appBar: AppBar(
+        flexibleSpace: Container(
+            decoration: const BoxDecoration(
+                // borderRadius: BorderRadius.only(bottomRight:Radius.circular(250)),
+                gradient: LinearGradient(
+                    colors: <Color>[Colors.black26, Colors.lightBlueAccent],
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft))),
+        // backgroundColor: Colors.red.shade600,
+        centerTitle: true,
+        title: const Text('Upload Image'),
+        actions: [
+          IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                chooseImage();
+              }),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(32),
+            decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('img/bacgFormImg.jpeg'),
+                    fit: BoxFit.cover)),
+          ),
+          uploading == false
+              ? Container(
+                  padding: const EdgeInsets.all(4),
+                  child: GridView.builder(
+                      itemCount: _aftCompImg.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2),
+                      itemBuilder: (context, index) {
+                        return Card(
+                          child: Image.file(
+                            File(_aftCompImg[index]!.path),
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      }),
+                )
+              : Stack(children: [
+                  Center(
+                      child: CircularPercentIndicator(
+                    radius: 100.0,
+                    lineWidth: 15.0,
+                    percent: progress,
+                    animation: true,
+                    animationDuration: 2000,
+                    center: Text(
+                      "${progress * 100}%",
+                      style: const TextStyle(
+                          fontSize: 20, color: Colors.redAccent),
+                    ),
+                    footer: const Text(
+                      "Uploading...",
+                      style: TextStyle(fontSize: 20, color: Colors.redAccent),
+                    ),
+                  )),
+                ])
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           setState(() {
-            Uploading = true;
+            uploading = true;
           });
           if (_aftCompImg != null) {
             for (int i = 0; i < _aftCompImg.length; i++) {
@@ -127,22 +145,22 @@ class _AddImageState extends State<AddImage> {
         heroTag: 'uniqueTag',
         backgroundColor: Colors.red,
         autofocus: true,
-          label: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: const [Icon(Icons.cloud_upload_outlined), Text(' upload')],
-          ),
+        label: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: const [Icon(Icons.cloud_upload_outlined), Text(' upload')],
+        ),
       ),
     );
   }
 
   //Compressing images
-  Future<void> customCompressed() async {
-    for (dynamic imageFile in _BeCompImag) {
+  Future<void> customCompressed({quality = 35, percentage = 10}) async {
+    for (dynamic imageFile in _beCompImag) {
       var result = await FlutterImageCompress.compressAndGetFile(
         // imageFile
         imageFile.absolute.path,
         imageFile.path + 'compressed.jpg',
-        quality: 80,
+        quality: 35,
         // minHeight: 200,
         // minWidth: 250,
       );
@@ -151,28 +169,26 @@ class _AddImageState extends State<AddImage> {
     setState(() {});
   }
 
-  //selecting images
+  //selecting images or file picker
   chooseImage() async {
     try {
-      _BeCompImag.clear();
+      _beCompImag.clear();
       _aftCompImg.clear();
       final List<XFile> pickedFile = await picker.pickMultiImage();
 
-      if (pickedFile.length < 5) {
+      if (pickedFile.length > 2) {
+        uploading = false;
         pickedFile.clear();
-        showSnackBar(Colors.redAccent, "Select atleast 4 images");
-        return;
-      }
-      if (pickedFile.length > 5) {
-        pickedFile.clear();
-        showSnackBar(Colors.redAccent, "Select maximum 4 images ");
+        _beCompImag.clear();
+        _aftCompImg.clear();
+        showSnackBar(Colors.redAccent, "Select maximum 1 images ");
         return;
       }
 
       if (pickedFile.isNotEmpty) {
-        pickedFile.forEach((e) {
-          _BeCompImag.add(File(e.path));
-        });
+        for (var e in pickedFile) {
+          _beCompImag.add(File(e.path));
+        }
         customCompressed();
         setState(() {});
       }
@@ -189,8 +205,8 @@ class _AddImageState extends State<AddImage> {
     final storageRef = FirebaseStorage.instance.ref();
     Reference ref = storageRef.child(
         'picture/${user!.uid}/${widget.postID}/${DateTime.now().microsecondsSinceEpoch}.jpeg');
-    // final uploadTask = ref.putFile(file, metaData);
-    final uploadTask = ref.putFile(file);
+    final uploadTask = ref.putFile(file, metaData);
+    // final uploadTask = ref.putFile(file);
     final taskSnapshot = await uploadTask.whenComplete(() => null);
     String url = await taskSnapshot.ref.getDownloadURL();
     return url;
@@ -198,19 +214,33 @@ class _AddImageState extends State<AddImage> {
 
   //uploading image link to firebase cloud
   storeEntry(List<String> imageurl) {
+    List<String> indexsearch = [];
+    String s = "";
+    for (int j = 0; j < widget.city.toString().length; j++) {
+      s += widget.city[j];
+      indexsearch.add(s.toLowerCase());
+    }
     FirebaseFirestore.instance.collection('State').doc(widget.postID).set({
       'name': widget.name,
+      'class': widget.std,
+      'board': widget.board,
       'phonenumber': widget.phonenumber,
       'state': widget.state,
       'city': widget.city,
+      'pincode': widget.pincode,
       'address': widget.address,
-      'about': widget.about,
+      'about': widget.schoolwebsite,
       'uid': user?.uid,
-      'Startdate': DateTime.now().microsecondsSinceEpoch,
+      'Startdate': DateTime.now(),
+      'rating': '0',
       'block': 'false',
       'visit': '0',
+      'class': widget.std,
+      'admission': 'closed',
       "postID": widget.postID,
       'image': imageurl,
+      'searchindex': indexsearch,
+      'location': [widget.lat, widget.lon],
       'search': [
         widget.state.toString().toUpperCase(),
         widget.city.toString().toUpperCase(),
@@ -224,18 +254,18 @@ class _AddImageState extends State<AddImage> {
           .collection('userIDs')
           .doc(widget.postID)
           .set({
+        'phonenumber': widget.phonenumber,
         'postID': widget.postID,
         'uid': user?.uid,
-        'state': widget.state
       }).whenComplete(() {
         showSnackBar(Colors.green, "uploaded successfully");
-        _BeCompImag.clear();
+        _beCompImag.clear();
         _aftCompImg.clear();
         _downloadurls.clear();
         Navigator.pushAndRemoveUntil(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, a, b) => HomeScreen(),
+              pageBuilder: (context, a, b) => const HomeScreen(),
               transitionDuration: const Duration(seconds: 0),
             ),
             (route) => false);
@@ -250,5 +280,9 @@ class _AddImageState extends State<AddImage> {
         duration: const Duration(seconds: 1),
         content: Text(text));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void dispose() {
+    super.dispose();
   }
 }
